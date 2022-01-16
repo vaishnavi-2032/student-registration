@@ -1,561 +1,319 @@
-#include <iostream>
-#include <fstream>
-#include <cstring>
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-#define ADMINUSER "Admin"
-#define ADMINPASSWORD "Admin123"
 
+#include <iostream>
+#include <stdio.h>
+#include <fstream>
+#include <stdlib.h>
+#include <cstdlib>
+#include <string>
+#include <string_view>
+#include <regex>
 
 using namespace std;
-
-char stdsRec[] = "stdtRecord.txt";
-char modulesRecord[] = "modRecord.txt";
-char tempFile[] = "tempFile.txt";
-
-class Std{
-
-  public:
-
-//add one std's record to DB
-    int addStdRecord(char *stdsRec){
-        int StdNo;
-        char name[50];
-
-        ofstream out(stdsRec, ios_base::app);
-
-        cout<<"\nEnter Std No : ";
-        cin>>StdNo;
-        out<<endl<<StdNo<<" | ";
-
-        cout<<"\nEnter Name (50 char):";
-        cin>>name;
-        out<<name<<" | ";
-
-        int flag=-1;
-        cout<<"\n0 - Under-Graduate,\n1 - Post-Graduate";
-        cout<<"\nEnter :";
-        cin>>flag;
-
-        int moduleCount =-1;
-
-        if(flag==0)
-            moduleCount = 6;
-        else if(flag ==1)
-            moduleCount = 4;
-        else{
-            cout<<"\nErr: Pl. enter either 0or1 ";
-            return -1;
-        }
-
-        for(int i=0; i<moduleCount; i++){
-            int module;
-            cout<<"\nEnter Module  No"<<i<<" : ";
-            cin>>module;
-            out<<module<<" | ";
-        }
-
-        char choice;
-        cout<<"\nadd Marks against each module? y/n :";
-        cin>>choice;
-
-        //separator to find start of marks
-        out<<" = ";
-
-        if(choice=='y')
-        {
-            for(int i=0; i<moduleCount; i++){
-                double marks;
-                cout<<"\nEnter Marks of Module  No"<<i<<" : ";
-                cin>>marks;
-                out<<marks<<" | ";
-            }
-
-        }
-
-        out.close();
-    }
-
-    //update any std's recrod to DB
-    int updateStdRecord(){
-        int StdNo;
-        cout<<"\nEnter Std Number :";
-        cin>>StdNo;
-        //modify if it exist e
-    }
-
-    //display record of any Std by his Stdno
-    int displayStdRecord(){
-        int StdNo;
-
-        //display if Std record exist
-        cout<<"\n# Find Any Module Details #\n";
-
-        cout<<"\nEnter Std No to be searched: ";
-        cin>>StdNo;
-
-        int flag = -1;
-        ifstream file(stdsRec);
-        string str;
-
-
-        while (getline(file, str))
-        {
-            if(str.length()>0){
-
-                char temp[1000];
-                memset(temp,1000,sizeof(temp));
-                strcpy(temp, str.c_str());
-
-                char * ptr;
-                ptr = strtok(temp ,"|");
-
-                int tempno = atoi(ptr);
-
-                if(StdNo == tempno )
-                {
-                    cout<<"\n"<<str;
-                    flag = 1;
-                    break;
-                }
-
-            }
-
-        }
-
-        if(flag==-1)
-            cout<<"\nNo Std found with No :"<<StdNo;
-
-        file.close();
-        getchar();getchar();
-    }
-
-    //display record of all Stds
-    int displayAllStdRecord(){
-        ifstream file(stdsRec);
-        string str;
-
-        cout<<"\n# List of All Std #";
-
-        if(!file)	{
-            cout<<"\nNo Record found !!";
-            return -1;
-        }
-
-
-        while (getline(file, str))
-        {
-            if(str.length()>0)
-            cout<<"\n\t"<<str;
-        }
-        file.close();
-        getchar();getchar();
-    }
-
-    int findStdMarks(){
-        cout<<"\n# Find Marks of any Std #\n";
-        int StdNo;
-
-        cout<<"\nEnter Std No : ";
-        cin>>StdNo;
-
-        int flag = -1;
-        ifstream file(stdsRec);
-        string str;
-
-
-        while (getline(file, str))
-        {
-            if(str.length()>0){
-
-                char temp[1000];
-                memset(temp,1000, sizeof(temp));
-                strcpy(temp, str.c_str());
-
-                char * ptr;
-                ptr = strtok(temp ,"|");
-
-                int tempno = atoi(ptr);
-
-                if(StdNo == tempno )
-                {
-                    memset(temp,1000,sizeof(temp));
-                    strcpy(temp, str.c_str());
-                    char *ptr1 = strtok(temp, "=");
-                    ptr1 = strtok(NULL,"=");
-                    //cout<<"\n====> "<<ptr1;
-                    ptr1 = strtok(ptr1, "|");
-                    double sum  = atof(ptr1);
-                    double minNo = sum;
-                    //cout<<"\nMin no is : "<< minNo;
-                    int countSub = 0;
-                    while(ptr1 = strtok(NULL,"|")){
-                        //cout<<"-> "<<ptr1;
-                        if(atof(ptr1)<minNo)
-                        	minNo = atof(ptr1);
-
-                        sum += atof(ptr1);
-                        countSub++;
-                    }
-
-                    //cout<<"\nsum is : "<<sum;
-                    //cout<<"\ncount sub : "<<countSub;
-                    //cout<<"\nMIn no is : "<<minNo;
-
-                    if(countSub == 6){
-                        sum -= minNo;
-                        cout<<"\nsum is : "<<sum;
-                        sum = sum / 5;
-                        cout<<"\nAvg Sum is top 5 sub: "<<sum;
-
-                        if(sum>70) cout<<"\nGrade : A";
-                        else if(sum>=60 && sum<=69)
-                        cout<<"\nGrade is : B+";
-                        else if(sum >=50 && sum<=59)
-                        cout<<"\nGrade is : B";
-                        else if(sum>=41 && sum<=49)
-                        cout<<"\nGrade is : C";
-                        else if(sum>=40)
-                        cout<<"\nGrade is : D";
-                        else if(sum<40)
-                        cout<<"\nGrade is: F";
-
-                    }
-                    else{
-                        sum = sum / 4;
-                        cout<<"\nAvg Sum of 4 sub : "<< sum;
-
-                        if(sum>= 76) cout<<"\nDistinction";
-                        else if(sum>=61 && sum<=75 )
-                        cout<<"\nMerit";
-                        else if(sum>=50 && sum<=60)
-                        cout<<"\nPass";
-                        else if(sum<50) cout<<"\nFail ";
-                    }
-
-                    flag = 1;
-                    break;
-                }
-
-            }
-
-        }
-
-        if(flag==-1)
-        cout<<"\nNo Std found with No : "<<StdNo;
-
-        file.close();
-        getchar();getchar();
-    }
-
-    int updateStd(){
-
-        cout<<"\n# Update Std Record #\n";
-        int StdNo;
-
-        cout<<"\nEnter Std No : ";
-        cin>>StdNo;
-
-        int flag = -1;
-        ifstream file(stdsRec);
-        string str;
-
-
-        int StdFound = 0;
-        while (getline(file, str))
-        {
-            if(str.length()>0){
-
-                char temp[1000];
-                memset(temp,1000,sizeof(temp));
-                strcpy(temp, str.c_str());
-
-                char * ptr;
-                ptr = strtok(temp ,"|");
-
-                int tempno = atoi(ptr);
-
-                if(StdNo == tempno )
-                {
-                    addStdRecord(tempFile);
-                    StdFound = 1;
-                }
-                else{
-                    ofstream file(tempFile, ios_base::app);
-                    file<<endl<<str;
-                    file.close();
-                }
-            }
-        }
-
-        file.close();
-
-        if(StdFound){
-            remove(stdsRec);
-            rename(tempFile, stdsRec);
-        }
-
-    }
+// Email Vaildation Pattern
+bool Emailcheck(string email)
+{
+    const regex pattern("(\\w+)(\\.|_)?(\\w*)@(\\w+)(\\.(\\w+))+");
+    return regex_match(email, pattern);
+}
+class student
+{
+private:
+    string name, roll_no, course, address, email_id;
+    long long int contact_no;
+
+public:
+    void menu();
+    void insert();
+    void display();
+    void modify();
+    void search();
+    void deleted();
 };
+// Project Menu
+void student::menu()
+{
+menustart:
+    int choice;
+    char x;
+    system("cls");
+    cout << "\t\t\t-----------------------------" << endl;
+    cout << "\t\t\t| STUDENT MANAGEMENT SYSTEM |" << endl;
+    cout << "\t\t\t-----------------------------" << endl;
+    cout << "\t\t\t 1. Enter New Record" << endl;
+    cout << "\t\t\t 2. Display Record" << endl;
+    cout << "\t\t\t 3. Modify Record" << endl;
+    cout << "\t\t\t 4. Search Record" << endl;
+    cout << "\t\t\t 5. Delete Record" << endl;
+    cout << "\t\t\t 6. Exit\n"
+         << endl;
 
-class Module{
-  public:
-
-    int displayAnyModuleInfo(){
-        int moduleNo;
-        cout<<"\n# Find Module Details #\n";
-
-        cout<<"\nEnter Module No :";
-        cin>>moduleNo;
-        int flag = -1;
-        ifstream file(modulesRecord);
-        string str;
-
-
-        while (getline(file, str))
+    cout << "\t\t\t............................" << endl;
+    cout << "\t\t\tChoose Options:[1/2/3/4/5/6]" << endl;
+    cout << "\t\t\t............................" << endl;
+    cout << " Enter Your Choose: ";
+    cin >> choice;
+    switch (choice)
+    {
+    case 1:
+        do
         {
-            if(str.length()>0){
-                char temp[1000];
-                memset(temp,1000,sizeof(temp));
-                strcpy(temp, str.c_str());
-
-                char * ptr;
-                ptr = strtok(temp ,"|");
-
-                int tempno = atoi(ptr);
-                cout<<"\nModule no is : "<<temp;
-
-                if(moduleNo == tempno )
-                {
-                    cout<<"\n"<<str;
-                    flag = 1;
-                    break;
-                }
-
-            }
-
-        }
-
-        if(!flag)
-        cout<<"\nNo Module found : "<<moduleNo;
-
+            insert();
+            cout << "\n\n\t\t\t Add Another Student Record (Y, N) : ";
+            cin >> x;
+        } while (x == 'y' || x == 'Y');
+        break;
+    case 2:
+        display();
+        break;
+    case 3:
+        modify();
+        break;
+    case 4:
+        search();
+        break;
+    case 5:
+        deleted();
+        break;
+    case 6:
+        cout << "\n\t\t\t Program Is Exit";
+        exit(0);
+    default:
+        cout << "\n\n\t\t\t Invalid Choice... Please Try Again...";
+    }
+    goto menustart;
+}
+void student::insert() // Add student details
+{
+    system("cls");
+    fstream file;
+    cout << "\n-------------------------------------------------------------------------------------------------------" << endl;
+    cout << "------------------------------------- Add Student Details ---------------------------------------------" << endl;
+    cout << "\t\t\tEnter Name: ";
+    cin >> name;
+    cout << "\t\t\tEnter Roll No.: ";
+    cin >> roll_no;
+    cout << "\t\t\tEnter Course: ";
+    cin >> course;
+email:
+    cout << "\t\t\tEnter Email Id(name@gmail.com): ";
+    cin >> email_id;
+    if (Emailcheck(email_id))
+    {
+        cout << "\t\t\t Your Email-Id is Valid" << endl;
+    }
+    else
+    {
+        cout << "\t\t\t Your Email-Id is InValid" << endl;
+        goto email;
+    }
+contact:
+    cout << "\t\t\tEnter Contact No(9639xxxxxx): ";
+    cin >> contact_no;
+    if (contact_no < 1000000000 || contact_no > 9999999999)
+    {
+        cout << "\t\t\t Please Enter Only 10 Digits..." << endl;
+        goto contact;
+    }
+    cout << "\t\t\tEnter Address: ";
+    cin >> address;
+    file.open("studentRecord.txt", ios::app | ios::out);
+    file << " " << name << " " << roll_no << " " << course << " " << email_id << " " << contact_no << " " << address << "\n";
+    file.close();
+}
+void student::display() // Display data of student
+{
+    system("cls");
+    fstream file;
+    int total = 1;
+    cout << "\n-------------------------------------------------------------------------------------------------------" << endl;
+    cout << "------------------------------------- Student Record Table --------------------------------------------" << endl;
+    file.open("studentRecord.txt", ios::in);
+    if (!file)
+    {
+        cout << "\n\t\t\tNo Data is Present... ";
         file.close();
-        getchar();getchar();
-
-
     }
-
-    int displayAllModulesInfo(){
-        cout<<"\n# List of All Modules #\n";
-
-        //read all modules from record
-
-        ifstream file(modulesRecord);
-        string str;
-        cout<<"\nModule No | Title | Level";
-        while (getline(file, str))
+    else
+    {
+        file >> name >> roll_no >> course >> email_id >> contact_no >> address;
+        while (!file.eof())
         {
-            if(str.length()>0)
-            cout<<"\n"<<str;
-            }
-            file.close();
-            getchar();getchar();
-    }
-
-    int updateModulesInfo(){
-        cout<<"\n# Update Module Info #";
-        int moduleNo;
-        cout<<"\nEnter Module No to be modified:";
-        cin>>moduleNo;
-
-    }
-
-    //add new module to DB
-    int addModule(char *modulerecord){
-        int moduleNo;
-        char title[50];
-        char level[50];
-
-        ofstream out(modulerecord, ios_base::app);
-
-        cout<<"\n# Add New Module #";
-
-        cout<<"\nEnter Module No : ";
-        cin>>moduleNo;
-        out<<endl<<moduleNo<<" | ";
-
-        cout<<"\nEnter Title of Module (50 char) :";
-        cin>>title;
-        out<<title<<" | ";
-
-        cout<<"\nEnter Level UnderGrad/Grad.:";
-        cin>>level;
-        out<<level<<" | ";
-
-        cout<<"\nModule Added !!";
-        getchar();
-
-        out.close();
-    }
-
-    int updateModule(){
-
-        cout<<"\n# Update Module Record #\n";
-        int moduleNo;
-
-        cout<<"\nEnter Module No : ";
-        cin>>moduleNo;
-
-        int flag = -1;
-        ifstream file(modulesRecord);
-        string str;
-
-
-        int moduleFound = 0;
-        while (getline(file, str))
-        {
-            if(str.length()>0){
-
-                char temp[1000];
-                memset(temp,1000,sizeof(temp));
-                strcpy(temp, str.c_str());
-
-                char * ptr;
-                ptr = strtok(temp ,"|");
-
-                int tempno = atoi(ptr);
-
-                if(moduleNo == tempno )
-                {
-                    addModule(tempFile);
-                    moduleFound = 1;
-                }
-                else{
-                    ofstream file(tempFile, ios_base::app);
-                    file<<endl<<str;
-                    file.close();
-                }
-            }
+            cout << "\n\n\t\t\tStudent No.: " << total++ << endl;
+            cout << "\t\t\tName: " << name << "\n";
+            cout << "\t\t\tRoll No.: " << roll_no << "\n";
+            cout << "\t\t\tCourse: " << course << "\n";
+            cout << "\t\t\tEmail Id: " << email_id << "\n";
+            cout << "\t\t\tContact No.: " << contact_no << "\n";
+            cout << "\t\t\tAddress: " << address << "\n";
+            file >> name >> roll_no >> course >> email_id >> contact_no >> address;
         }
+        if (total == 0)
+        {
 
+            cout << "\n\t\t\tNo Data is Present..." << endl;
+        }
+    }
+
+    file.close();
+}
+void student::modify() // Modify details of student
+{
+    system("cls");
+    fstream file, file1;
+    string rollno;
+    int found = 0;
+    cout << "\n-------------------------------------------------------------------------------------------------------" << endl;
+    cout << "------------------------------------- Student Modify Details ------------------------------------------" << endl;
+    file.open("studentRecord.txt", ios::in);
+    if (!file)
+    {
+        cout << "\n\t\t\tNo Data is Present..";
         file.close();
-
-        if(moduleFound){
-            remove(modulesRecord);
-            rename(tempFile, modulesRecord);
-        }
-
     }
-};
+    else
+    {
+        cout << "\nEnter Roll No. of Student which you want to Modify: ";
+        cin >> rollno;
+        file1.open("record.txt", ios::app | ios::out);
+        file >> name >> roll_no >> course >> email_id >> contact_no >> address;
+        while (!file.eof())
+        {
+            if (rollno != roll_no)
+                file1 << " " << name << " " << roll_no << " " << course << " " << email_id << " " << contact_no << " " << address << "\n";
+            else
+            {
+                cout << "\n\t\t\tEnter Name: ";
+                cin >> name;
+                cout << "\t\t\tEnter Roll No.: ";
+                cin >> roll_no;
+                cout << "\t\t\tEnter Course: ";
+                cin >> course;
+            email:
+                cout << "\t\t\tEnter Email Id(name@gmail.com): ";
+                cin >> email_id;
+                if (Emailcheck(email_id))
+                {
+                    cout << "\t\t\t Your Email-Id is Valid" << endl;
+                }
+                else
+                {
+                    cout << "\t\t\t Your Email-Id is InValid" << endl;
+                    goto email;
+                }
+            contact:
+                cout << "\t\t\tEnter Contact No(9639xxxxxx): ";
+                cin >> contact_no;
+                if (contact_no < 1000000000 || contact_no > 9999999999)
+                {
+                    cout << "\t\t\t Please Enter Only 10 Digits..." << endl;
+                    goto contact;
+                }
+                cout << "\t\t\tEnter Address: ";
+                cin >> address;
+                file1 << " " << name << " " << roll_no << " " << course << " " << email_id << " " << contact_no << " " << address << "\n";
+                found++;
+            }
+            file >> name >> roll_no >> course >> email_id >> contact_no >> address;
+        }
+        if (found == 0)
+        {
+            cout << "\n\n\t\t\t Student Roll No. Not Found....";
+        }
+        file1.close();
+        file.close();
+        remove("studentRecord.txt");
+        rename("record.txt", "studentRecord.txt");
+    }
+}
 
-int main(int argc, char** argv) {
-	Std stdObj;
-	Module modObject;
-
-	int outerChoice = 0;
-	while(outerChoice!=9){
-		system("cls");
-		cout<<"\n College Registration System  \n\n";
-		cout<<"\n1. Admin Login";
-		cout<<"\n9. Exit";
-		cout<<"\n\nEnter your choice : ";
-		cin>>outerChoice;
-
-		if( outerChoice == 1 ){
-			char adminUser[10];
-			char adminPassword[10];
-
-			system("cls");
-			cout<<"\n ---------- Admin Login -------";
-			cout<<"\n\n Enter username: ";
-			cin>>adminUser;
-			cout<<"\n Enter password:";
-			cin>>adminPassword;
-			if( (strcmp(adminUser, "Admin") == 0) &&( strcmp(adminPassword, "Admin123") == 0)){
-				getchar();
-				getchar();
-				system("cls");
-				int innerChoice;
-				while(innerChoice != 0){
-				    cout<<"\nWelcome "<<adminUser;
-					cout<<"\n1. Add Record";
-        			cout<<"\n2. Update Record";
-        			cout<<"\n3. Get any record";
-        			cout<<"\n4. Get all record";
-        			cout<<"\n5. Add Module";
-        			cout<<"\n6. Get Any Module details";
-        			cout<<"\n7. Get All Modules details";
-        			cout<<"\n8. Update Module";
-        			cout<<"\n9. Find Std Marks";
-					cout<<"\n0. Exit";
-					cout<<"\n\n Enter your choice : ";
-					cin>>innerChoice;
-        			switch(innerChoice){
-    					case 1:
-        					stdObj.addStdRecord(stdsRec);
-        				break;
-
-        				case 2:
-        					stdObj.updateStd();
-        				break;
-
-        				case 3:
-        					stdObj.displayStdRecord();
-        				break;
-
-        				case 4:
-        					stdObj.displayAllStdRecord();
-        				break;
-
-        				case 5:
-        					modObject.addModule(modulesRecord);
-        				break;
-
-        				case 6:
-        					modObject.displayAnyModuleInfo();
-        				break;
-
-        				case 7:
-        					modObject.displayAllModulesInfo();
-        				break;
-
-        				case 8:
-        					modObject.updateModule();
-        				break;
-
-        				case 9:
-        					stdObj.findStdMarks();
-        				break;
-
-        				case 0:
-        					cout<<"\nThankyou !! Good Bye\n ";
-        				break;
-
-        				default:
-        					cout<<"\nInvalid choice..";
-        				getchar();
-					}
-					system("cls");
-    			}
-
-			}
-			else{
-				cout<<"\n\n Error : Invalid Credentials. Press any key to conitnue";
-				getchar();
-				getchar();
-			}
-		}
-		else if(outerChoice!=9){
-			cout<<"\n\n Invalid choice. Press any key to continue..";
-			getchar();
-			getchar();
-		}
-		else{
-			cout<<"\n\n Thank you for using it !! Press any key to exit";
-			getchar();
-			getchar();
-		}
-	}
-	return 0;
+void student::search() // search data of student
+{
+    system("cls");
+    fstream file;
+    int found = 0;
+    file.open("studentRecord.txt", ios::in);
+    if (!file)
+    {
+        cout << "\n-------------------------------------------------------------------------------------------------------" << endl;
+        cout << "------------------------------------- Student Search Data --------------------------------------------" << endl;
+        cout << "\n\t\t\tNo Data is Present... " << endl;
+    }
+    else
+    {
+        string rollno;
+        cout << "\n-------------------------------------------------------------------------------------------------------" << endl;
+        cout << "------------------------------------- Student Search Table --------------------------------------------" << endl;
+        cout << "\nEnter Roll No. of Student which you want to search: ";
+        cin >> rollno;
+        file >> name >> roll_no >> course >> email_id >> contact_no >> address;
+        while (!file.eof())
+        {
+            if (rollno == roll_no)
+            {
+                cout << "\n\n\t\t\tName: " << name << "\n";
+                cout << "\t\t\tRoll No.: " << roll_no << "\n";
+                cout << "\t\t\tCourse: " << course << "\n";
+                cout << "\t\t\tEmail Id: " << email_id << "\n";
+                cout << "\t\t\tContact No.: " << contact_no << "\n";
+                cout << "\t\t\tAddress: " << address << "\n";
+                found++;
+            }
+            file >> name >> roll_no >> course >> email_id >> contact_no >> address;
+            if (found == 0)
+            {
+                cout << "\n\t\t\t Student Roll NO. Not Found....";
+            }
+        }
+        file.close();
+    }
+}
+void student::deleted() // ddeleted data of student
+{
+    system("cls");
+    fstream file, file1;
+    int found = 0;
+    string roll;
+    cout << "\n-------------------------------------------------------------------------------------------------------" << endl;
+    cout << "------------------------------------- Delete Student Details ------------------------------------------" << endl;
+    file.open("studentRecord.txt", ios::in);
+    if (!file)
+    {
+        cout << "\n\t\t\tNo Data is Present..";
+        file.close();
+    }
+    else
+    {
+        cout << "\nEnter Roll No. of Student which you want Delete Data: ";
+        cin >> roll;
+        file1.open("record.txt", ios::app | ios::out);
+        file >> name >> roll_no >> course >> email_id >> contact_no >> address;
+        while (!file.eof())
+        {
+            if (roll != roll_no)
+            {
+                file1 << " " << name << " " << roll_no << " " << course << " " << email_id << " " << contact_no << " " << address << "\n";
+            }
+            else
+            {
+                found++;
+                cout << "\n\t\t\tSuccessfully Delete Data";
+            }
+            file >> name >> roll_no >> course >> email_id >> contact_no >> address;
+        }
+        if (found == 0)
+        {
+            cout << "\n\t\t\t Student Roll NO. Not Found....";
+        }
+        file1.close();
+        file.close();
+        remove("studentRecord.txt");
+        rename("record.txt", "studentRecord.txt");
+    }
+}
+int main()
+{
+    student project; // object
+    project.menu();  //object calling
+    
+    return 0;
 }
